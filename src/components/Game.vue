@@ -52,7 +52,9 @@ export default defineComponent({
         <Timer v-model:duration="timer" class="game__timer" />
         <Player :game-id="id" />
 
-        <button @click="endTurn" :disabled="waiting">End Turn</button>
+        <button @click="endTurn" :disabled="waiting">
+            {{ waiting ? 'Enemy Turn' : 'End Turn' }}
+        </button>
     </div>
 </template>
 

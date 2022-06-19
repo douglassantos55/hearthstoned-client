@@ -1,5 +1,5 @@
 <script lang="ts">
-import { ref, defineComponent } from 'vue'
+import { ref, defineComponent, type PropType } from 'vue'
 import server from '../server'
 import CardComponent from './Card.vue'
 import type { Card, MapOfCards } from '../types'
@@ -12,34 +12,30 @@ type Payload = {
 
 export default defineComponent({
     name: 'StartingHand',
+    props: {
+        cards: {
+            type: Object as PropType<MapOfCards>,
+            required: true,
+        },
+    },
     components: {
         CardComponent,
     },
     setup(_,  { emit }) {
         const gameId = ref('')
         const waiting = ref(false)
-
-        const cards = ref<MapOfCards>({})
         const cardsToDiscard = ref<string[]>([])
 
         server.on('wait_other_players', (payload: Card[]) => {
             waiting.value = true
             if (payload && payload.length > 0) {
-                cards.value = {}
-                for (const card of payload) {
-                    cards.value[card.Id] = card
-                }
+                emit('update:cards', payload)
             }
-            emit('hand', Object.values(cards.value))
         })
 
         server.on('starting_hand', (payload: Payload) => {
             waiting.value = false
             gameId.value = payload.game_id
-
-            for (const card of payload.hand) {
-                cards.value[card.Id] = card
-            }
         })
 
         function discard() {
@@ -66,7 +62,7 @@ export default defineComponent({
             return findIndex(id) != -1
         }
 
-        return { cards, waiting, discard, toggleCard, isSelected }
+        return { waiting, discard, toggleCard, isSelected }
     }
 })
 </script>

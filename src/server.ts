@@ -35,8 +35,10 @@ const server = {
      * @param {object} payload - The payload received from server
      */
     _notify(type: string, payload: Record<string, any>) {
-        for (const listener of listeners[type]) {
-            listener(payload)
+        if (listeners[type]) {
+            for (const listener of listeners[type]) {
+                listener(payload)
+            }
         }
     }
 }

@@ -25,10 +25,20 @@ export default defineComponent({
         const cards = ref<MapOfCards>({})
         const cardsToDiscard = ref<string[]>([])
 
-        server.on('wait_other_players', () => waiting.value = true)
+        server.on('wait_other_players', (payload: Card[]) => {
+            waiting.value = true
+            if (payload && payload.length > 0) {
+                cards.value = {}
+                for (const card of payload) {
+                    cards.value[card.Id] = card
+                }
+            }
+        })
 
         server.on('starting_hand', (payload: Payload) => {
+            waiting.value = false
             gameId.value = payload.game_id
+
             for (const card of payload.hand) {
                 cards.value[card.Id] = card
             }
@@ -71,6 +81,7 @@ export default defineComponent({
             <CardComponent
                 :card="card"
                 :key="card.Id"
+                :disabled="waiting"
                 v-for="card in cards"
                 @click="toggleCard(card.Id)"
                 :class="{'card--selected': isSelected(card.Id)}"

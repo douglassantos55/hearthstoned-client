@@ -34,8 +34,10 @@ export default {
 </script>
 
 <template>
-    <button @click="queueUp" v-if="!matchId" :disabled="waiting">Queue up</button>
+    <div class="queue">
+        <button @click="queueUp" v-if="!matchId" :disabled="waiting">Queue up</button>
 
-    <button @click="confirm" v-if="matchId" :disabled="waiting">Confirm match</button>
-    <button @click="cancel" v-if="matchId" :disabled="waiting">Cancel match</button>
+        <button @click="confirm" v-if="matchId" :disabled="waiting">Confirm match</button>
+        <button @click="cancel" v-if="matchId" :disabled="waiting">Cancel match</button>
+    </div>
 </template>

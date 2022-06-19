@@ -1,8 +1,8 @@
 <script lang="ts">
 import { ref, defineComponent } from 'vue'
-import type { Card, MapOfCards } from '../types'
-import CardComponent from './Card.vue'
-import StartingHand from './StartingHand.vue'
+import type { Card } from '../types'
+import Timer from './Timer.vue'
+import Player from './Player.vue'
 import server from '../server'
 
 type TurnPayload = {
@@ -15,71 +15,55 @@ type TurnPayload = {
 
 export default defineComponent({
     components: {
-        StartingHand,
-        CardComponent,
+        Timer,
+        Player,
     },
     setup() {
         const id = ref('')
         const timer = ref(0)
-        const state = ref('')
-        const hand = ref<MapOfCards>({})
+        const waiting = ref(true)
 
         server.on('starting_hand', function (payload) {
-            setCards(payload.hand)
-
             id.value = payload.game_id
-            state.value = 'StartingHand'
             timer.value = payload.duration
         })
 
         server.on('wait_turn', function (payload: TurnPayload) {
-            state.value = 'Turn'
+            waiting.value = true
             timer.value = payload.duration
         })
 
-        server.on('start_turn', (payload: TurnPayload) => {
-            state.value = 'Turn'
-            setCards(payload.cards)
+        server.on('start_turn', function (payload: TurnPayload) {
+            waiting.value = false
+            timer.value = payload.duration
         })
 
-        function setCards(cards: Card[]) {
-            if (cards.length > 0) {
-                hand.value = {}
-                for (const card of cards) {
-                    hand.value[card.Id] = card
-                }
-            }
+        function endTurn() {
+            server.send('end_turn', id.value)
         }
 
-        return { state, hand, setCards }
+        return { id, timer, endTurn, waiting }
     },
 })
 </script>
 
 <template>
     <div class="game">
-        {{ state }}
+        <Timer v-model:duration="timer" class="game__timer" />
+        <Player :game-id="id" />
 
-        <StartingHand @hand="setCards" v-show="state == 'StartingHand'" />
-
-        <div class="hand" v-if="state == 'Turn'">
-            <CardComponent
-                v-for="card in hand"
-                :card="card"
-                :key="card.Id"
-            />
-        </div>
+        <button @click="endTurn" :disabled="waiting">End Turn</button>
     </div>
 </template>
 
 <style scoped>
-.hand {
-    left: 0;
+.game {
     width: 100%;
-    bottom: 10px;
-    display: flex;
+    height: 100vh;
+}
+.game__timer {
+    top: 10px;
+    right: 10px;
     position: fixed;
-    align-items: center;
-    justify-content: center;
 }
 </style>

@@ -26,6 +26,7 @@ export default defineComponent({
     width: 170px;
     height: 220px;
     margin: 0 10px;
+    flex-shrink: 0;
     cursor: pointer;
     position: relative;
     border-radius: 5px;
@@ -33,6 +34,9 @@ export default defineComponent({
     border: 1px solid #ccc;
     transition: all 0.1s ease-out;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+}
+.card:hover {
+    transform: translateY(-20px) rotateZ(-1deg);
 }
 .card--selected {
     transform: translateY(-10px);

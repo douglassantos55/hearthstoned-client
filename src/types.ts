@@ -6,3 +6,7 @@ export type Card = {
     Health: number
 }
 
+export type MapOfCards = {
+    [uuid: string]: Card
+}
+

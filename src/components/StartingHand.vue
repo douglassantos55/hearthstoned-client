@@ -1,16 +1,13 @@
 <script lang="ts">
 import { ref, defineComponent } from 'vue'
 import server from '../server'
-import type { Card } from '../types'
 import CardComponent from './Card.vue'
-
-type MapOfCards = {
-    [uuid: string]: Card
-}
+import type { Card, MapOfCards } from '../types'
 
 type Payload = {
-    game_id: string
     hand: Card[]
+    game_id: string
+    duration: number
 }
 
 export default defineComponent({
@@ -18,7 +15,7 @@ export default defineComponent({
     components: {
         CardComponent,
     },
-    setup() {
+    setup(_,  { emit }) {
         const gameId = ref('')
         const waiting = ref(false)
 
@@ -33,6 +30,7 @@ export default defineComponent({
                     cards.value[card.Id] = card
                 }
             }
+            emit('hand', Object.values(cards.value))
         })
 
         server.on('starting_hand', (payload: Payload) => {

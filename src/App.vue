@@ -1,17 +1,20 @@
 <script lang="ts">
 import { ref, defineComponent } from 'vue'
 import server from './server'
+import Game from './components/Game.vue'
 import Queue from './components/Queue.vue'
-import StartingHand from './components/StartingHand.vue'
 
 export default defineComponent({
     components: {
+        Game,
         Queue,
-        StartingHand,
     },
     setup() {
         const state = ref('Queue')
-        server.on('starting_hand', () => state.value = 'StartingHand')
+
+        server.on('starting_hand', function () {
+            state.value = 'Game'
+        })
 
         return { state }
     },
@@ -163,7 +166,7 @@ function attack(cardId: string) {
 
 <template>
     <Queue v-show="state == 'Queue'" />
-    <StartingHand v-show="state == 'StartingHand'" />
+    <Game v-show="state == 'Game'" />
 
     <!--
   <header>

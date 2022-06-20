@@ -23,9 +23,8 @@ export default defineComponent({
 
 <style scoped>
 .card {
-    width: 170px;
-    height: 220px;
-    margin: 0 10px;
+    width: 150px;
+    height: 190px;
     flex-shrink: 0;
     cursor: pointer;
     position: relative;

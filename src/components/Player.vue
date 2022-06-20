@@ -2,10 +2,15 @@
 import { ref, defineComponent } from 'vue'
 import server from '../server'
 import Hand from './Hand.vue'
+import Board from './Board.vue'
 
 export default defineComponent({
     name: 'Player',
     props: {
+        playing: {
+            type: Boolean,
+            required: true,
+        },
         gameId: {
             type: String,
             required: true,
@@ -13,6 +18,7 @@ export default defineComponent({
     },
     components: {
         Hand,
+        Board,
     },
     setup(props) {
         const curMana = ref(0)
@@ -25,9 +31,10 @@ export default defineComponent({
         })
 
         server.on('card_played', function (payload) {
-            curMana.value -= payload.Mana
+            if (props.playing) {
+                curMana.value -= payload.Mana
+            }
         })
-
 
         function playCard(cardId: string) {
             server.send('play_card', {
@@ -48,27 +55,27 @@ export default defineComponent({
 
 <template>
     <div class="player">
+        <Board :playing="playing" />
+        <Hand @play-card="playCard" />
+
         <span class="player__mana">
             {{ curMana }}/{{ maxMana }}
         </span>
-
-        <Hand
-            class="player__hand"
-            @play-card="playCard"
-        />
     </div>
 </template>
 
 <style scoped>
+.player {
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 50vh;
+    position: fixed;
+}
 .player__mana {
     right: 10px;
     bottom: 10px;
     font-size: 15px;
-    position: fixed;
-}
-.player__hand {
-    left: 0;
-    bottom: 10px;
     position: fixed;
 }
 </style>

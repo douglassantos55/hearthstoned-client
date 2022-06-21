@@ -23,6 +23,7 @@ export default defineComponent({
 
 <style scoped>
 .card {
+    z-index: 200;
     width: 150px;
     height: 190px;
     flex-shrink: 0;
@@ -35,6 +36,7 @@ export default defineComponent({
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
 }
 .card:hover {
+    z-index: 300;
     transform: translateY(-20px) rotateZ(-1deg);
 }
 .card--selected {

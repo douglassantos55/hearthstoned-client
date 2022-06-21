@@ -1,4 +1,5 @@
 <script lang="ts">
+import anime from 'animejs'
 import { ref, defineComponent } from 'vue'
 import server from '../server'
 import type { Card, MapOfCards } from '../types'
@@ -10,7 +11,7 @@ export default defineComponent({
         StartingHand,
         CardComponent,
     },
-    setup() {
+    setup(_, { emit }) {
         const startingHand = ref(false)
         const hand = ref<MapOfCards>({})
 
@@ -41,7 +42,28 @@ export default defineComponent({
             }
         }
 
-        return { startingHand, hand, setCards }
+        function playCard(cardId: string, element: HTMLElement) {
+            const rect = element.getBoundingClientRect()
+            anime({
+                easing: 'cubicBezier(0,1.02,0,1.02)',
+                targets: element,
+                keyframes: [
+                    { zIndex: 999, duration: 0 },
+                    {
+                        scale: 1.3,
+                        duration: 1500,
+                        translateY: '50%',
+                        top: -(document.body.clientHeight / 2),
+                        left: -(rect.x - rect.width / 2),
+                    },
+                ],
+                complete: function () {
+                    emit('playCard', cardId)
+                }
+            })
+        }
+
+        return { startingHand, hand, setCards, playCard }
     },
 })
 </script>
@@ -54,14 +76,15 @@ export default defineComponent({
             v-show="startingHand"
         />
 
-        <div class="cards" v-if="!startingHand">
+        <transition-group name="cards" class="cards" v-if="!startingHand" tag="div">
             <CardComponent
                 v-for="card in hand"
                 :card="card"
                 :key="card.Id"
-                @click="$emit('play-card', card.Id)"
+                class="hand__card"
+                @click.self="playCard(card.Id, $event.target)"
             />
-        </div>
+        </transition-group>
     </div>
 </template>
 
@@ -71,5 +94,16 @@ export default defineComponent({
     display: flex;
     align-items: center;
     justify-content: center;
+}
+.hand__card {
+    margin-right: -70px;
+}
+.cards-enter-active,
+.cards-leave-active {
+    transition: opacity 0.1s, transform 0.5s ease;
+}
+.cards-enter-from {
+    opacity: 0.5;
+    transform: translateY(-30px) rotateZ(5deg);
 }
 </style>

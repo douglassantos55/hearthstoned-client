@@ -103,6 +103,8 @@ export default defineComponent({
     font-family: sans-serif;
 }
 .starting-hand__cards {
+    gap: 20px;
+    display: flex;
     margin: 30px 0 80px;
 }
 </style>

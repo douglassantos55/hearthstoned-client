@@ -5,6 +5,7 @@ import Timer from './Timer.vue'
 import Player from './Player.vue'
 import Opponent from './Opponent.vue'
 import server from '../server'
+import anime from 'animejs'
 
 type TurnPayload = {
     cards: Card[]
@@ -25,6 +26,9 @@ export default defineComponent({
         const timer = ref(0)
         const waiting = ref(false)
 
+        const attackerId = ref('')
+        const attacker = ref<HTMLElement>()
+
         server.on('starting_hand', function (payload) {
             id.value = payload.game_id
             timer.value = payload.duration
@@ -44,7 +48,59 @@ export default defineComponent({
             server.send('end_turn', id.value)
         }
 
-        return { id, timer, endTurn, waiting }
+        function setAttacker(target: HTMLElement, minionId: string) {
+            attacker.value = target
+            attackerId.value = minionId
+        }
+
+        function attack(target: HTMLElement, minionId: string) {
+            if (attackerId.value) {
+                if (attacker.value) {
+                    animate(attacker.value, target, function () {
+                        server.send('attack', {
+                            GameId: id.value,
+                            Defender: minionId,
+                            Attacker: attackerId.value,
+                        })
+                    })
+                }
+            }
+        }
+
+        function animate(attacker: HTMLElement, target: HTMLElement, callback: any) {
+            const dest = target.getBoundingClientRect()
+            const source = attacker.getBoundingClientRect()
+
+            anime({
+                scale: 1.2,
+                zIndex: 99,
+                duration: 500,
+                easing: 'cubicBezier(0,.74,1,-0.31)',
+                direction: 'alternate',
+                targets: attacker,
+                complete: callback,
+                translateX: function () {
+                    return dest.x - source.x
+                },
+                translateY: function () {
+                    return (dest.y) - source.y
+                },
+            })
+
+            /**
+            anime({
+                delay: 550,
+                duration: 100,
+                translateY: -10,
+                targets: target,
+                background: '#ffc2c2',
+                direction: 'alternate',
+                complete: callback,
+            })
+            */
+        }
+
+        return { id, timer, endTurn, waiting, attack, setAttacker }
     },
 })
 </script>
@@ -57,8 +113,16 @@ export default defineComponent({
             {{ waiting ? 'Enemy Turn' : 'End Turn' }}
         </button>
 
-        <Opponent :playing="waiting" />
-        <Player :game-id="id" :playing="!waiting" />
+        <Opponent
+            :playing="waiting"
+            @minion-selected="attack"
+        />
+
+        <Player
+            :game-id="id"
+            :playing="!waiting"
+            @minion-selected="setAttacker"
+        />
     </div>
 </template>
 

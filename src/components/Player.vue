@@ -55,7 +55,11 @@ export default defineComponent({
 
 <template>
     <div class="player">
-        <Board :playing="playing" />
+        <Board
+            :playing="playing"
+            @minion-selected="(target, id) => $emit('minionSelected', target, id)"
+        />
+
         <Hand @play-card="playCard" />
 
         <span class="player__mana">

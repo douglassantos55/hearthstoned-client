@@ -1,25 +1,43 @@
 <script lang="ts">
+import anime from 'animejs'
 import type { Card } from '@/types'
-import { defineComponent, type PropType } from 'vue'
+import { reactive, watch, defineComponent, type PropType } from 'vue'
 
 export default defineComponent({
     props: {
+        selected: {
+            type: Boolean,
+        },
         minion: {
             type: Object as PropType<Card>,
             required: true,
         },
     },
-    setup() {
+    setup(props) {
+        const attrs = reactive({
+            damage: props.minion.Damage,
+            health: props.minion.Health,
+        })
 
+        watch(() => props.minion, function (minion: Card) {
+            anime({
+                round: 1,
+                targets: attrs,
+                damage: minion.Damage,
+                health: minion.Health,
+            })
+        })
+
+        return { attrs }
     },
 })
 </script>
 
 <template>
-    <div class="minion">
+    <div :class="['minion', {'minion--selected': selected}]">
         <div class="minion__name">{{ minion.Name }}</div>
-        <div class="minion__stat minion__damage">{{ minion.Damage }}</div>
-        <div class="minion__stat minion__health">{{ minion.Health }}</div>
+        <div class="minion__stat minion__damage">{{ attrs.damage }}</div>
+        <div class="minion__stat minion__health">{{ attrs.health }}</div>
     </div>
 </template>
 
@@ -35,6 +53,10 @@ export default defineComponent({
     font-family: sans-serif;
     transition: all 0.2s ease-out;
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+}
+.minion--selected {
+    transform: scale(1.1);
+    box-shadow: 0 5px 7px rgba(0, 0, 0, 0.3);
 }
 .minion:hover {
     border-color: green;

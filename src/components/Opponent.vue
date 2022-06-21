@@ -2,6 +2,7 @@
 import { defineComponent, ref } from 'vue'
 import Board from './Board.vue'
 import server from '@/server'
+import anime from 'animejs'
 
 export default defineComponent({
     props: {
@@ -26,8 +27,20 @@ export default defineComponent({
 
         server.on('card_played', function (payload) {
             if (props.playing) {
-                cardsInHand.value--
-                curMana.value -= payload.Mana
+                const random = Math.floor(Math.random() * (cardsInHand.value - 1))
+                console.log(random)
+                const element = document.getElementById('#' + random)
+                anime({
+                    duration: 1200,
+                    easing: 'cubicBezier(0,1.02,0,1.02)',
+                    targets: element,
+                    translateY: 300,
+                    scale: 1.3,
+                    complete: function () {
+                        cardsInHand.value--
+                        curMana.value -= payload.Mana
+                    },
+                })
             }
         })
 
@@ -38,11 +51,15 @@ export default defineComponent({
 
 <template>
     <div class="opponent">
-        <div class="opponent__hand">
-            <div class="opponent__card" v-for="i in cardsInHand" :key="i" />
-        </div>
+        <transition-group tag="div" name="cards" class="opponent__hand">
+            <div class="opponent__card" :id="i" v-for="i in cardsInHand" :key="i" />
+        </transition-group>
 
-        <Board :playing="playing" class="board--reverse" />
+        <Board
+            :playing="playing"
+            class="board--reverse"
+            @minion-selected="(target, id) => $emit('minionSelected', target, id)"
+        />
 
         <span class="opponent__mana">
             {{ curMana }}/{{ maxMana }}
@@ -74,10 +91,19 @@ export default defineComponent({
     width: 150px;
     height: 190px;
     flex-shrink: 0;
+    margin-left: -90px;
     border-radius: 5px;
     background: brown;
     border: 1px solid #ccc;
     transition: all 0.1s ease-out;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+}
+.cards-enter-active,
+.cards-leave-active {
+    transition: opacity 0.1s, transform 0.5s ease;
+}
+.cards-enter-from {
+    opacity: 0.5;
+    transform: translateY(30px) rotateZ(-5deg);
 }
 </style>

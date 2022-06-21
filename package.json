@@ -8,9 +8,11 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "animejs": "^3.2.1",
     "vue": "^3.2.33"
   },
   "devDependencies": {
+    "@types/animejs": "^3.1.4",
     "@types/node": "^16.11.27",
     "@vitejs/plugin-vue": "^2.3.1",
     "@vue/tsconfig": "^0.1.3",

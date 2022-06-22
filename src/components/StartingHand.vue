@@ -93,7 +93,9 @@ export default defineComponent({
     width: 100%;
     height: 100%;
     display: flex;
+    z-index: 1000;
     position: fixed;
+    background: #fff;
     align-items: center;
     flex-direction: column;
     justify-content: center;

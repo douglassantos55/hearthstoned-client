@@ -69,6 +69,19 @@ export default defineComponent({
             }
         }
 
+        function attackPlayer(target: HTMLElement) {
+            if (attackerId.value) {
+                if (attacker.value) {
+                    animate(attacker.value, target, function () {
+                        server.send('attack_player', {
+                            GameId: id.value,
+                            Attacker: attackerId.value,
+                        })
+                    })
+                }
+            }
+        }
+
         function animate(attacker: HTMLElement, target: HTMLElement, callback: any) {
             const dest = target.getBoundingClientRect()
             const source = attacker.getBoundingClientRect()
@@ -88,21 +101,9 @@ export default defineComponent({
                     return (dest.y) - source.y
                 },
             })
-
-            /**
-            anime({
-                delay: 550,
-                duration: 100,
-                translateY: -10,
-                targets: target,
-                background: '#ffc2c2',
-                direction: 'alternate',
-                complete: callback,
-            })
-            */
         }
 
-        return { id, timer, endTurn, waiting, attack, setAttacker }
+        return { id, timer, endTurn, waiting, attack, setAttacker, attackPlayer }
     },
 })
 </script>
@@ -119,6 +120,7 @@ export default defineComponent({
         <Opponent
             :playing="waiting"
             @minion-selected="attack"
+            @player-selected="attackPlayer"
         />
 
         <Player
@@ -147,7 +149,20 @@ export default defineComponent({
     transform: translateY(-50%);
 }
 .end-turn {
+    top: 50%;
+    border: 0;
+    right: 30px;
+    color: #fff;
     z-index: 99;
-    position: relative;
+    cursor: pointer;
+    position: fixed;
+    padding: 15px 20px;
+    background: #4f4ff1;
+    border-radius: 10px;
+    transform: translateY(-50%);
+}
+.end-turn:disabled {
+    background: #ddd;
+    cursor: not-allowed;
 }
 </style>

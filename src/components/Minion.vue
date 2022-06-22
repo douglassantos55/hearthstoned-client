@@ -45,7 +45,7 @@ export default defineComponent({
 <style scoped>
 .minion {
     width: 100px;
-    height: 130px;
+    height: 120px;
     cursor: pointer;
     background: #ddd;
     position: relative;

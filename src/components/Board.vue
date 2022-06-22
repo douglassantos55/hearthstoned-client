@@ -3,7 +3,6 @@ import { defineComponent, ref } from 'vue'
 import server from '@/server'
 import Minion from './Minion.vue'
 import type { Card, MapOfCards } from '@/types'
-import anime from 'animejs'
 
 export default defineComponent({
     props: {
@@ -31,44 +30,12 @@ export default defineComponent({
                 setTimeout(function () {
                     delete minions.value[payload.Id]
                 }, 500)
-                /*
-                const element = document.getElementById(payload.Id)
-
-                anime({
-                    duration: 100,
-                    translateY: -10,
-                    targets: element,
-                    background: '#ffc2c2',
-                    direction: 'alternate',
-                    complete: function () {
-                        delete minions.value[payload.Id]
-                    },
-                })
-                */
             }
         })
 
         server.on('minion_taken_damage', function (payload: Card) {
             if (minions.value[payload.Id]) {
                 minions.value[payload.Id] = payload
-                /*
-                const element = document.getElementById(payload.Id)
-
-                anime({
-                    scale: 1.2,
-                    zIndex: 99,
-                    duration: 500,
-                    easing: 'cubicBezier(0,.74,1,-0.31)',
-                    direction: 'alternate',
-                    targets: element,
-                    translateY: function () {
-                        return 150 * (props.playing ? -1 : 1)
-                    },
-                    complete: function () {
-                        minions.value[payload.Id] = payload
-                    }
-                })
-                */
             }
         })
 
@@ -105,7 +72,7 @@ export default defineComponent({
     position: relative;
     align-items: flex-start;
     justify-content: center;
-    height: calc(50vh - 200px);
+    height: calc(50vh / 3);
 }
 .board--reverse {
     align-items: flex-end;

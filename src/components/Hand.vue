@@ -68,14 +68,16 @@ export default defineComponent({
 </template>
 
 <style scoped>
-.hand {
+.cards {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 .hand__card {
-    margin-right: -70px;
+    margin-right: -3%;
+    width: calc(50vh / 3 - 20px);
+    height: calc(50vh / 3);
 }
 .cards-enter-active {
     pointer-events: none;

@@ -26,7 +26,6 @@ export default defineComponent({
     z-index: 200;
     width: 150px;
     height: 190px;
-    flex-shrink: 0;
     cursor: pointer;
     position: relative;
     border-radius: 5px;

@@ -60,6 +60,10 @@ export default defineComponent({
             @minion-selected="(target, id) => $emit('minionSelected', target, id)"
         />
 
+        <div class="player__portrait">
+            <img src="http://placeimg.com/100/100/people" />
+        </div>
+
         <Hand @play-card="playCard" />
 
         <span class="player__mana">
@@ -71,10 +75,14 @@ export default defineComponent({
 <style scoped>
 .player {
     left: 0;
-    bottom: 0;
+    bottom: 1%;
     width: 100%;
     height: 50vh;
     position: fixed;
+}
+.player__portrait {
+    text-align: center;
+    height: calc(50vh / 3);
 }
 .player__mana {
     right: 10px;

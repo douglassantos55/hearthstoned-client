@@ -42,28 +42,7 @@ export default defineComponent({
             }
         }
 
-        function playCard(cardId: string, element: HTMLElement) {
-            const rect = element.getBoundingClientRect()
-            anime({
-                easing: 'cubicBezier(0,1.02,0,1.02)',
-                targets: element,
-                keyframes: [
-                    { zIndex: 999, duration: 0 },
-                    {
-                        scale: 1.3,
-                        duration: 1500,
-                        translateY: '50%',
-                        top: -(document.body.clientHeight / 2),
-                        left: -(rect.x - rect.width / 2),
-                    },
-                ],
-                complete: function () {
-                    emit('playCard', cardId)
-                }
-            })
-        }
-
-        return { startingHand, hand, setCards, playCard }
+        return { startingHand, hand, setCards }
     },
 })
 </script>
@@ -82,7 +61,7 @@ export default defineComponent({
                 :card="card"
                 :key="card.Id"
                 class="hand__card"
-                @click.self="playCard(card.Id, $event.target)"
+                @click="$emit('playCard', card.Id)"
             />
         </transition-group>
     </div>
@@ -98,12 +77,19 @@ export default defineComponent({
 .hand__card {
     margin-right: -70px;
 }
-.cards-enter-active,
-.cards-leave-active {
+.cards-enter-active {
+    pointer-events: none;
     transition: opacity 0.1s, transform 0.5s ease;
 }
 .cards-enter-from {
     opacity: 0.5;
     transform: translateY(-30px) rotateZ(5deg);
+}
+.cards-leave-active {
+    transition: opacity 0.5s, transform 1s ease;
+}
+.cards-leave-to {
+    opacity: 0;
+    transform: translateY(-100px);
 }
 </style>

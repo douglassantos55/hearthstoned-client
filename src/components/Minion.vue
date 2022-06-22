@@ -22,6 +22,7 @@ export default defineComponent({
         watch(() => props.minion, function (minion: Card) {
             anime({
                 round: 1,
+                duration: 1000,
                 targets: attrs,
                 damage: minion.Damage,
                 health: minion.Health,

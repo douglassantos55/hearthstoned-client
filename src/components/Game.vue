@@ -1,11 +1,12 @@
 <script lang="ts">
 import { ref, defineComponent } from 'vue'
+import anime from 'animejs'
+import server from '../server'
 import type { Card } from '../types'
 import Timer from './Timer.vue'
 import Player from './Player.vue'
 import Opponent from './Opponent.vue'
-import server from '../server'
-import anime from 'animejs'
+import PlayedCard from './PlayedCard.vue'
 
 type TurnPayload = {
     cards: Card[]
@@ -20,6 +21,7 @@ export default defineComponent({
         Timer,
         Player,
         Opponent,
+        PlayedCard,
     },
     setup() {
         const id = ref('')
@@ -107,6 +109,7 @@ export default defineComponent({
 
 <template>
     <div class="game">
+        <PlayedCard class="game__played-card" />
         <Timer v-model:duration="timer" class="game__timer" />
 
         <button @click="endTurn" :disabled="waiting" class="end-turn">
@@ -135,6 +138,13 @@ export default defineComponent({
     top: 30px;
     left: 20px;
     position: fixed;
+}
+.game__played-card {
+    top: 50%;
+    left: 50px;
+    z-index: 400;
+    position: fixed;
+    transform: translateY(-50%);
 }
 .end-turn {
     z-index: 99;

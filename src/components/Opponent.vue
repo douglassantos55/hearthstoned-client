@@ -2,7 +2,6 @@
 import { defineComponent, ref } from 'vue'
 import Board from './Board.vue'
 import server from '@/server'
-import anime from 'animejs'
 
 export default defineComponent({
     props: {
@@ -27,20 +26,8 @@ export default defineComponent({
 
         server.on('card_played', function (payload) {
             if (props.playing) {
-                const random = Math.floor(Math.random() * (cardsInHand.value - 1))
-                console.log(random)
-                const element = document.getElementById('#' + random)
-                anime({
-                    duration: 1200,
-                    easing: 'cubicBezier(0,1.02,0,1.02)',
-                    targets: element,
-                    translateY: 300,
-                    scale: 1.3,
-                    complete: function () {
-                        cardsInHand.value--
-                        curMana.value -= payload.Mana
-                    },
-                })
+                cardsInHand.value--
+                curMana.value -= payload.Mana
             }
         })
 
@@ -98,12 +85,18 @@ export default defineComponent({
     transition: all 0.1s ease-out;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
 }
-.cards-enter-active,
-.cards-leave-active {
+.cards-enter-active {
     transition: opacity 0.1s, transform 0.5s ease;
 }
 .cards-enter-from {
     opacity: 0.5;
     transform: translateY(30px) rotateZ(-5deg);
+}
+.cards-leave-active {
+    transition: opacity 0.5s, transform 1s ease;
+}
+.cards-leave-to {
+    opacity: 0;
+    transform: translateY(100px);
 }
 </style>

@@ -27,6 +27,11 @@ export default defineComponent({
 
         server.on('minion_destroyed', function (payload: Card) {
             if (minions.value[payload.Id]) {
+                minions.value[payload.Id] = payload
+                setTimeout(function () {
+                    delete minions.value[payload.Id]
+                }, 500)
+                /*
                 const element = document.getElementById(payload.Id)
 
                 anime({
@@ -39,11 +44,14 @@ export default defineComponent({
                         delete minions.value[payload.Id]
                     },
                 })
+                */
             }
         })
 
         server.on('minion_taken_damage', function (payload: Card) {
             if (minions.value[payload.Id]) {
+                minions.value[payload.Id] = payload
+                /*
                 const element = document.getElementById(payload.Id)
 
                 anime({
@@ -60,6 +68,7 @@ export default defineComponent({
                         minions.value[payload.Id] = payload
                     }
                 })
+                */
             }
         })
 
@@ -103,7 +112,7 @@ export default defineComponent({
 }
 .board-enter-active,
 .board-leave-active {
-    transition: all 0.5s ease;
+    transition: all 0.5s ease 0.5s;
 }
 .board-enter-from,
 .board-leave-to {

@@ -1,5 +1,4 @@
 <script lang="ts">
-import anime from 'animejs'
 import { ref, defineComponent } from 'vue'
 import server from '../server'
 import type { Card, MapOfCards } from '../types'
@@ -11,7 +10,7 @@ export default defineComponent({
         StartingHand,
         CardComponent,
     },
-    setup(_, { emit }) {
+    setup() {
         const startingHand = ref(false)
         const hand = ref<MapOfCards>({})
 
@@ -49,11 +48,13 @@ export default defineComponent({
 
 <template>
     <div class="hand">
-        <StartingHand
-            :cards="hand"
-            @update:cards="setCards"
-            v-show="startingHand"
-        />
+        <Teleport to="body">
+            <StartingHand
+                :cards="hand"
+                @update:cards="setCards"
+                v-show="startingHand"
+            />
+        </Teleport>
 
         <transition-group name="cards" class="cards" v-if="!startingHand" tag="div">
             <CardComponent

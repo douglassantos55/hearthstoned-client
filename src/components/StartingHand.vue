@@ -71,6 +71,8 @@ export default defineComponent({
     <div class="starting-hand">
         <h1 class="starting-hand__title">Choose which cards you wish to discard</h1>
 
+        <h2 class="wait-message" v-if="waiting">Please, wait while the other player selects his starting hand</h2>
+
         <div class="starting-hand__cards">
             <CardComponent
                 :card="card"
@@ -108,5 +110,9 @@ export default defineComponent({
     gap: 20px;
     display: flex;
     margin: 30px 0 80px;
+}
+.wait-message {
+    font-size: 20px;
+    font-family: sans-serif;
 }
 </style>

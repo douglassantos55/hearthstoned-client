@@ -1,8 +1,9 @@
 <script lang="ts">
-import { ref, defineComponent } from 'vue'
+import { ref, toRefs, defineComponent } from 'vue'
 import server from '../server'
 import Hand from './Hand.vue'
 import Board from './Board.vue'
+import useAnimation from '@/composables/useAnimation'
 
 export default defineComponent({
     name: 'Player',
@@ -25,6 +26,8 @@ export default defineComponent({
         const maxMana = ref(0)
         const health = ref(30)
 
+        const attrs = useAnimation({ health, curMana, maxMana })
+
         server.on('start_turn', function (payload) {
             maxMana.value = payload.mana
             curMana.value = maxMana.value
@@ -36,6 +39,12 @@ export default defineComponent({
             }
         })
 
+        server.on('player_damage_taken', function (payload) {
+            if (!props.playing) {
+                health.value = payload.Health
+            }
+        })
+
         function playCard(cardId: string) {
             server.send('play_card', {
                 GameId: props.gameId,
@@ -44,10 +53,8 @@ export default defineComponent({
         }
 
         return {
-            curMana,
-            maxMana,
-            health,
             playCard,
+            ...toRefs(attrs),
         }
     },
 })
@@ -62,6 +69,7 @@ export default defineComponent({
 
         <div class="player__portrait">
             <img src="http://placeimg.com/100/100/people" />
+            <span class="player__health">{{ health }}</span>
         </div>
 
         <Hand @play-card="playCard" />

@@ -69,12 +69,13 @@ export default defineComponent({
             }
         }
 
-        function attackPlayer(target: HTMLElement) {
+        function attackPlayer(target: HTMLElement, playerId: string) {
             if (attackerId.value) {
                 if (attacker.value) {
                     animate(attacker.value, target, function () {
                         server.send('attack_player', {
                             GameId: id.value,
+                            Defender: playerId,
                             Attacker: attackerId.value,
                         })
                     })

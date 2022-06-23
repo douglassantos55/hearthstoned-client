@@ -2,6 +2,7 @@
 import { defineComponent, ref } from 'vue'
 import Board from './Board.vue'
 import server from '@/server'
+import useAnimation from '@/composables/useAnimation'
 
 export default defineComponent({
     props: {
@@ -13,25 +14,40 @@ export default defineComponent({
     components: {
         Board,
     },
-    setup(props) {
-        const curMana = ref(0)
+    setup(props, { emit }) {
+        const id = ref('')
+        const mana = ref(0)
+        const health = ref(30)
         const maxMana = ref(0)
         const cardsInHand = ref(3)
 
+        const attrs = useAnimation({ mana, health, maxMana })
+
         server.on('wait_turn', function (payload) {
             maxMana.value = payload.mana
-            curMana.value = maxMana.value
+            mana.value = maxMana.value
+            id.value = payload.opponent_id
             cardsInHand.value = payload.cards_in_hand
+        })
+
+        server.on('player_damage_taken', function (payload) {
+            if (payload.Id == id.value) {
+                health.value = payload.Health
+            }
         })
 
         server.on('card_played', function (payload) {
             if (props.playing) {
                 cardsInHand.value--
-                curMana.value -= payload.Mana
+                mana.value -= payload.Mana
             }
         })
 
-        return { curMana, maxMana, cardsInHand }
+        function select(event: Event) {
+            emit('playerSelected', event.target, id.value)
+        }
+
+        return { id, attrs, cardsInHand, select }
     },
 })
 </script>
@@ -42,8 +58,9 @@ export default defineComponent({
             <div class="opponent__card" :id="i" v-for="i in cardsInHand" :key="i" />
         </transition-group>
 
-        <button class="opponent__portrait" @click="$emit('playerSelected', $event.target)">
+        <button class="opponent__portrait" @click="select">
             <img src="http://placeimg.com/100/100/people" />
+            {{ attrs.health }}
         </button>
 
         <Board
@@ -53,7 +70,7 @@ export default defineComponent({
         />
 
         <span class="opponent__mana">
-            {{ curMana }}/{{ maxMana }}
+            {{ attrs.mana }}/{{ attrs.maxMana }}
         </span>
     </div>
 </template>

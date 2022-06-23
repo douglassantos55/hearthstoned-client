@@ -7,6 +7,7 @@ import Timer from './Timer.vue'
 import Player from './Player.vue'
 import Opponent from './Opponent.vue'
 import PlayedCard from './PlayedCard.vue'
+import Error from './Error.vue'
 
 type TurnPayload = {
     cards: Card[]
@@ -19,6 +20,7 @@ type TurnPayload = {
 export default defineComponent({
     components: {
         Timer,
+        Error,
         Player,
         Opponent,
         PlayedCard,
@@ -111,6 +113,7 @@ export default defineComponent({
 
 <template>
     <div class="game">
+        <Error />
         <PlayedCard class="game__played-card" />
         <Timer v-model:duration="timer" class="game__timer" />
 

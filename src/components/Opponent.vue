@@ -62,7 +62,6 @@ export default defineComponent({
         <button class="opponent__portrait" @click="select" :disabled="minions > 0">
             <img src="http://placeimg.com/100/100/people" />
             {{ attrs.health }}
-            {{ minions }}
         </button>
 
         <Board

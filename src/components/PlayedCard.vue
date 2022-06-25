@@ -1,21 +1,19 @@
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent } from 'vue'
 import server from '@/server'
-import type { Card } from '@/types'
 import CardComponent from './Card.vue'
+import useCardDetails from '@/composables/useCardDetails'
 
 export default defineComponent({
     components: {
         CardComponent,
     },
     setup() {
-        const card = ref<Card>()
+        const { card, setCard, removeCard } = useCardDetails()
 
         server.on('card_played', function (payload) {
-            card.value = payload
-            setTimeout(function () {
-                card.value = undefined
-            }, 1700)
+            setCard(payload)
+            setTimeout(removeCard, 1500)
         })
 
         return { card }
@@ -35,11 +33,11 @@ export default defineComponent({
 .played-card .card {
     pointer-events: none;
     transform: scale(1.3);
-    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.6);
 }
 .card-enter-active,
 .card-leave-active {
-    transition: all 1s ease 0.5s;
+    transition: all 0.5s ease;
 }
 .card-enter-from,
 .card-leave-to {

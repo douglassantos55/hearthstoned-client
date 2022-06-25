@@ -89,6 +89,7 @@ export default defineComponent({
     transform: translateY(-30px) rotateZ(5deg);
 }
 .cards-leave-active {
+    pointer-events: none;
     transition: opacity 0.5s, transform 1s ease;
 }
 .cards-leave-to {

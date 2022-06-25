@@ -67,7 +67,7 @@ export default defineComponent({
             :minion="minion"
             :key="minion.Id"
             :playing="playing"
-            @click.self="select($event, minion.Id)"
+            @click="select($event, minion.Id)"
             :selected="selectedMinion == minion.Id"
         />
     </transition-group>

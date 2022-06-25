@@ -1,7 +1,8 @@
 <script lang="ts">
 import anime from 'animejs'
 import type { Card } from '@/types'
-import { reactive, watch, defineComponent, type PropType, computed } from 'vue'
+import useCardDetails from '@/composables/useCardDetails'
+import { reactive, watch, defineComponent, type PropType, computed, ref } from 'vue'
 
 type Minion = Card & {
     State: string
@@ -32,6 +33,8 @@ export default defineComponent({
             return props.minion.State == 'Exhausted' && props.playing
         })
 
+        const { setCard, removeCard } = useCardDetails()
+
         watch(() => props.minion, function (minion: Card) {
             anime({
                 round: 1,
@@ -42,23 +45,26 @@ export default defineComponent({
             })
         })
 
-        return { attrs, disabled }
+        return { attrs, disabled, setCard, removeCard }
     },
 })
 </script>
 
 <template>
-    <div :class="['minion', {'minion--disabled': disabled, 'minion--selected': selected}]">
-        <div class="minion__name">
-            {{ minion.Name }}
-        </div>
+    <div @mouseenter="setCard(minion)" @mouseleave="removeCard">
+        <button :disabled="disabled" :class="['minion', {'minion--exhausted': disabled, 'minion--selected': selected}]">
+            <div class="minion__name">
+                {{ minion.Name }}
+            </div>
 
-        <div class="minion__ability" v-if="minion.Ability">
-            <img src="thunder-icon.png" width="17" height="17" />
-        </div>
+            <div class="minion__ability" v-if="minion.Ability">
+                <img src="thunder-icon.png" width="17" height="17" />
+            </div>
 
-        <div class="minion__stat minion__damage">{{ attrs.damage }}</div>
-        <div class="minion__stat minion__health">{{ attrs.health }}</div>
+            <div class="minion__stat minion__damage">{{ attrs.damage }}</div>
+            <div class="minion__stat minion__health">{{ attrs.health }}</div>
+
+        </button>
     </div>
 </template>
 
@@ -77,28 +83,31 @@ export default defineComponent({
     transition: all 0.2s ease-out;
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
 }
-.minion--disabled {
+.minion:disabled {
     cursor: not-allowed;
     pointer-events: none;
 }
-.minion--disabled:before,
-.minion--disabled:after {
+.minion--exhausted:before,
+.minion--exhausted:after {
     top: 0;
     right: 0;
     opacity: 0;
+    color: #222;
     content: 'z';
     font-size: 10px;
     position: absolute;
+    pointer-events: none;
     animation: floatUp 3s ease-out 0s infinite;
 }
-.minion--disabled:after {
+.minion--exhausted:after {
     animation-delay: 1.5s;
 }
 .minion--selected {
     transform: scale(1.1);
-    box-shadow: 0 5px 7px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 7px 9px rgba(0, 0, 0, 0.3);
 }
-.minion:hover {
+.minion:hover,
+.minion--selected {
     border-color: green;
 }
 .minion__name {
@@ -107,6 +116,7 @@ export default defineComponent({
     text-align: center;
     padding: 0 10px;
     position: absolute;
+    pointer-events: none;
 }
 .minion__stat {
     color: #fff;
@@ -118,6 +128,7 @@ export default defineComponent({
     position: absolute;
     border-radius: 100%;
     align-items: center;
+    pointer-events: none;
     justify-content: center;
 }
 .minion__damage {
@@ -138,6 +149,7 @@ export default defineComponent({
     position: absolute;
     align-items: center;
     border-radius: 100%;
+    pointer-events: none;
     border: 2px solid #888;
     justify-content: center;
     transform: translateX(-50%);

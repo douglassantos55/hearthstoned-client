@@ -63,7 +63,6 @@ export default defineComponent({
 
             <div class="minion__stat minion__damage">{{ attrs.damage }}</div>
             <div class="minion__stat minion__health">{{ attrs.health }}</div>
-
         </button>
     </div>
 </template>
@@ -85,7 +84,6 @@ export default defineComponent({
 }
 .minion:disabled {
     cursor: not-allowed;
-    pointer-events: none;
 }
 .minion--exhausted:before,
 .minion--exhausted:after {

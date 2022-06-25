@@ -1,15 +1,23 @@
 <script lang="ts">
 import anime from 'animejs'
 import type { Card } from '@/types'
-import { reactive, watch, defineComponent, type PropType } from 'vue'
+import { reactive, watch, defineComponent, type PropType, computed } from 'vue'
+
+type Minion = Card & {
+    State: string
+}
 
 export default defineComponent({
     props: {
+        playing: {
+            type: Boolean,
+            required: true,
+        },
         selected: {
             type: Boolean,
         },
         minion: {
-            type: Object as PropType<Card>,
+            type: Object as PropType<Minion>,
             required: true,
         },
     },
@@ -17,6 +25,10 @@ export default defineComponent({
         const attrs = reactive({
             damage: props.minion.Damage,
             health: props.minion.Health,
+        })
+
+        const disabled = computed(function () {
+            return props.minion.State == 'Exhausted' && props.playing
         })
 
         watch(() => props.minion, function (minion: Card) {
@@ -29,14 +41,14 @@ export default defineComponent({
             })
         })
 
-        return { attrs }
+        return { attrs, disabled }
     },
 })
 </script>
 
 <template>
-    <div :class="['minion', {'minion--selected': selected}]">
-        <div class="minion__name">{{ minion.Name }}</div>
+    <div :class="['minion', {'minion--disabled': disabled, 'minion--selected': selected}]">
+        <div class="minion__name">{{ minion.Name }} <small>({{ minion.State }})</small></div>
         <div class="minion__stat minion__damage">{{ attrs.damage }}</div>
         <div class="minion__stat minion__health">{{ attrs.health }}</div>
     </div>
@@ -54,6 +66,10 @@ export default defineComponent({
     font-family: sans-serif;
     transition: all 0.2s ease-out;
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+}
+.minion--disabled {
+    cursor: not-allowed;
+    pointer-events: none;
 }
 .minion--selected {
     transform: scale(1.1);

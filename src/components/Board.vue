@@ -21,6 +21,7 @@ export default defineComponent({
         server.on('card_played', function (payload: Card) {
             if (props.playing) {
                 minions.value[payload.Id] = payload
+                emit('minionPlayed', payload.Id)
             }
         })
 
@@ -29,11 +30,18 @@ export default defineComponent({
                 minions.value[payload.Id] = payload
                 setTimeout(function () {
                     delete minions.value[payload.Id]
+                    emit('minionDestroyed', payload.Id)
                 }, 500)
             }
         })
 
         server.on('minion_taken_damage', function (payload: Card) {
+            if (minions.value[payload.Id]) {
+                minions.value[payload.Id] = payload
+            }
+        })
+
+        server.on('attribute_changed', function (payload) {
             if (minions.value[payload.Id]) {
                 minions.value[payload.Id] = payload
             }
@@ -58,6 +66,7 @@ export default defineComponent({
             v-for="minion in minions"
             :minion="minion"
             :key="minion.Id"
+            :playing="playing"
             @click.self="select($event, minion.Id)"
             :selected="selectedMinion == minion.Id"
         />

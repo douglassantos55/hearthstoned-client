@@ -20,6 +20,7 @@ export default defineComponent({
         const health = ref(30)
         const maxMana = ref(0)
         const cardsInHand = ref(3)
+        const minions = ref(0)
 
         const attrs = useAnimation({ mana, health, maxMana })
 
@@ -47,7 +48,7 @@ export default defineComponent({
             emit('playerSelected', event.target, id.value)
         }
 
-        return { id, attrs, cardsInHand, select }
+        return { id, attrs, minions, cardsInHand, select }
     },
 })
 </script>
@@ -58,14 +59,17 @@ export default defineComponent({
             <div class="opponent__card" :id="i" v-for="i in cardsInHand" :key="i" />
         </transition-group>
 
-        <button class="opponent__portrait" @click="select">
+        <button class="opponent__portrait" @click="select" :disabled="minions > 0">
             <img src="http://placeimg.com/100/100/people" />
             {{ attrs.health }}
+            {{ minions }}
         </button>
 
         <Board
             :playing="playing"
             class="board--reverse"
+            @minion-played="minions++"
+            @minion-destroyed="minions--"
             @minion-selected="(target, id) => $emit('minionSelected', target, id)"
         />
 

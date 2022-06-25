@@ -143,12 +143,13 @@ export default defineComponent({
 .game__timer {
     top: 30px;
     left: 20px;
+    z-index: 700;
     position: fixed;
 }
 .game__played-card {
     top: 50%;
     left: 50px;
-    z-index: 400;
+    z-index: 300;
     position: fixed;
     transform: translateY(-50%);
 }
@@ -157,7 +158,7 @@ export default defineComponent({
     border: 0;
     right: 30px;
     color: #fff;
-    z-index: 99;
+    z-index: 400;
     cursor: pointer;
     position: fixed;
     padding: 15px 20px;

@@ -14,7 +14,9 @@ export default defineComponent({
         <span class="card__item card__mana">{{ card.Mana }}</span>
 
         <span class="card__name">{{ card.Name }}</span>
-        <span class="card__ability">When your turn start, draw an extra card</span>
+        <span class="card__ability" v-if="card.Ability">
+            {{ card.Ability.Description }}
+        </span>
 
         <span class="card__item card__damage">{{ card.Damage }}</span>
         <span class="card__item card__health">{{ card.Health }}</span>
@@ -35,7 +37,7 @@ export default defineComponent({
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
 }
 .card:hover {
-    z-index: 300;
+    z-index: 201;
     transform: translateY(-20px) rotateZ(-1deg);
 }
 .card--selected {

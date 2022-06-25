@@ -33,7 +33,7 @@ export default defineComponent({
     top: 10px;
     gap: 20px;
     right: 10px;
-    z-index: 2000;
+    z-index: 600;
     display: flex;
     position: fixed;
     flex-direction: column;

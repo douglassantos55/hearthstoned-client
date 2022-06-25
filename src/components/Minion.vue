@@ -5,6 +5,7 @@ import { reactive, watch, defineComponent, type PropType, computed } from 'vue'
 
 type Minion = Card & {
     State: string
+    Ability: { Description: string }
 }
 
 export default defineComponent({
@@ -48,12 +49,21 @@ export default defineComponent({
 
 <template>
     <div :class="['minion', {'minion--disabled': disabled, 'minion--selected': selected}]">
-        <div class="minion__name">{{ minion.Name }} <small>({{ minion.State }})</small></div>
+        <div class="minion__name">
+            {{ minion.Name }}
+        </div>
+
+        <div class="minion__ability" v-if="minion.Ability">
+            <img src="thunder-icon.png" width="17" height="17" />
+        </div>
+
         <div class="minion__stat minion__damage">{{ attrs.damage }}</div>
         <div class="minion__stat minion__health">{{ attrs.health }}</div>
     </div>
 </template>
 
+<style>
+</style>
 <style scoped>
 .minion {
     width: 100px;
@@ -70,6 +80,19 @@ export default defineComponent({
 .minion--disabled {
     cursor: not-allowed;
     pointer-events: none;
+}
+.minion--disabled:before,
+.minion--disabled:after {
+    top: 0;
+    right: 0;
+    opacity: 0;
+    content: 'z';
+    font-size: 10px;
+    position: absolute;
+    animation: floatUp 3s ease-out 0s infinite;
+}
+.minion--disabled:after {
+    animation-delay: 1.5s;
 }
 .minion--selected {
     transform: scale(1.1);
@@ -104,5 +127,36 @@ export default defineComponent({
 .minion__health {
     right: 0;
     background: #991919;
+}
+.minion__ability {
+    left: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    bottom: -5px;
+    background: #555;
+    position: absolute;
+    align-items: center;
+    border-radius: 100%;
+    border: 2px solid #888;
+    justify-content: center;
+    transform: translateX(-50%);
+}
+@keyframes floatUp {
+    0% {
+        transform: none;
+    }
+    25% {
+        transform: translateX(-5px) translateY(-10px);
+    }
+    50% {
+        opacity: 1;
+        transform: translateX(5px) translateY(-20px);
+    }
+    100% {
+        opacity: 0;
+        font-size: 25px;
+        transform: translateX(-5px) translateY(-40px);
+    }
 }
 </style>

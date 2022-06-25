@@ -76,7 +76,7 @@ export default defineComponent({
 <style scoped>
 .board {
     gap: 10px;
-    z-index: 99;
+    z-index: 100;
     display: flex;
     position: relative;
     align-items: flex-start;

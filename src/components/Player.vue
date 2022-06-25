@@ -22,6 +22,7 @@ export default defineComponent({
         Board,
     },
     setup(props) {
+        const id = ref('')
         const curMana = ref(0)
         const maxMana = ref(0)
         const health = ref(30)
@@ -29,6 +30,7 @@ export default defineComponent({
         const attrs = useAnimation({ health, curMana, maxMana })
 
         server.on('start_turn', function (payload) {
+            id.value = payload.player_id
             maxMana.value = payload.mana
             curMana.value = maxMana.value
         })
@@ -40,7 +42,7 @@ export default defineComponent({
         })
 
         server.on('player_damage_taken', function (payload) {
-            if (!props.playing) {
+            if (payload.Id == id.value) {
                 health.value = payload.Health
             }
         })

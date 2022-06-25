@@ -16,6 +16,12 @@ export default defineComponent({
             setTimeout(removeCard, 1500)
         })
 
+        server.on('minion_destroyed', function (payload) {
+            if (payload.Id === card.value?.Id) {
+                removeCard()
+            }
+        })
+
         return { card }
     },
 })

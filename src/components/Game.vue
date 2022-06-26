@@ -1,5 +1,5 @@
 <script lang="ts">
-import { ref, defineComponent } from 'vue'
+import { ref, defineComponent, toRaw } from 'vue'
 import anime from 'animejs'
 import server from '../server'
 import type { Card } from '../types'
@@ -93,11 +93,16 @@ export default defineComponent({
         function attack(target: HTMLElement, minionId: string) {
             if (attackerId.value) {
                 if (attacker.value) {
-                    animate(attacker.value, target, function () {
+                    // remove reactivity so that it doesn't change when another
+                    // minion is selected
+                    const aggressor = toRaw(attacker.value)
+                    const aggressorId = toRaw(attackerId.value)
+
+                    animate(aggressor, target, function () {
                         server.send('attack', {
                             GameId: id.value,
                             Defender: minionId,
-                            Attacker: attackerId.value,
+                            Attacker: aggressorId,
                         })
                     })
                 }
@@ -107,11 +112,16 @@ export default defineComponent({
         function attackPlayer(target: HTMLElement, playerId: string) {
             if (attackerId.value) {
                 if (attacker.value) {
-                    animate(attacker.value, target, function () {
+                    // remove reactivity so that it doesn't change when another
+                    // minion is selected
+                    const aggressor = toRaw(attacker.value)
+                    const aggressorId = toRaw(attackerId.value)
+
+                    animate(aggressor, target, function () {
                         server.send('attack_player', {
                             GameId: id.value,
                             Defender: playerId,
-                            Attacker: attackerId.value,
+                            Attacker: aggressorId,
                         })
                     })
                 }

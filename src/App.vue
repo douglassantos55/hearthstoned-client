@@ -1,33 +1,17 @@
 <script lang="ts">
-import { ref, defineComponent } from 'vue'
-import server from './server'
-import Game from './components/Game.vue'
-import Queue from './components/Queue.vue'
+import { defineComponent } from 'vue'
+import useRouter from './composables/useRouter'
 
 export default defineComponent({
-    components: {
-        Game,
-        Queue,
-    },
     setup() {
-        const state = ref('Queue')
-
-        server.on('starting_hand', function () {
-            state.value = 'Game'
-        })
-
-        return { state }
+        const { view } = useRouter()
+        return { view }
     },
 })
 </script>
 
 <template>
-    <Queue v-show="state == 'Queue'" />
-
-    <Game
-        v-show="state == 'Game'"
-        @game-over="state = 'Queue'"
-    />
+    <component :is="view" />
 </template>
 
 <style>

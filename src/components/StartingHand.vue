@@ -3,12 +3,7 @@ import { ref, defineComponent, type PropType } from 'vue'
 import server from '../server'
 import CardComponent from './Card.vue'
 import type { Card, MapOfCards } from '../types'
-
-type Payload = {
-    hand: Card[]
-    game_id: string
-    duration: number
-}
+import useRouter from '@/composables/useRouter'
 
 export default defineComponent({
     name: 'StartingHand',
@@ -22,8 +17,10 @@ export default defineComponent({
         CardComponent,
     },
     setup(_,  { emit }) {
-        const gameId = ref('')
+        const { route } = useRouter()
+
         const waiting = ref(false)
+        const gameId = ref(route.state.game_id)
         const cardsToDiscard = ref<string[]>([])
 
         server.on('wait_other_players', (payload: Card[]) => {
@@ -31,11 +28,6 @@ export default defineComponent({
             if (payload && payload.length > 0) {
                 emit('update:cards', payload)
             }
-        })
-
-        server.on('starting_hand', (payload: Payload) => {
-            waiting.value = false
-            gameId.value = payload.game_id
         })
 
         function discard() {

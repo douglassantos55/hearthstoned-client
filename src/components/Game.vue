@@ -8,6 +8,8 @@ import Player from './Player.vue'
 import Opponent from './Opponent.vue'
 import PlayedCard from './PlayedCard.vue'
 import Error from './Error.vue'
+import Result from './Result.vue'
+import useRouter from '@/composables/useRouter'
 
 type TurnPayload = {
     cards: Card[]
@@ -22,30 +24,61 @@ export default defineComponent({
         Timer,
         Error,
         Player,
+        Result,
         Opponent,
         PlayedCard,
     },
     setup() {
-        const id = ref('')
-        const timer = ref(0)
+        const { route } = useRouter()
+
+        const result = ref('')
         const waiting = ref(false)
+        const id = ref(route.state.game_id)
+        const timer = ref(route.state.duration)
 
         const attackerId = ref('')
         const attacker = ref<HTMLElement>()
 
-        server.on('starting_hand', function (payload) {
-            id.value = payload.game_id
-            timer.value = payload.duration
+        server.on('win', function () {
+            setTimeout(function () {
+                timer.value = 0
+                result.value = 'win'
+            }, 1200)
+        })
+
+        server.on('loss', function () {
+            setTimeout(function () {
+                timer.value = 0
+                result.value = 'loss'
+            }, 1200)
         })
 
         server.on('wait_turn', function (payload: TurnPayload) {
             waiting.value = true
             timer.value = payload.duration
+
+            anime({
+                targets: '.opponent-turn',
+                opacity: 1,
+                translateX: ['-50%', '-50%'],
+                translateY: ['-100%', '-50%'],
+                duration: 1000,
+                direction: 'alternate',
+            })
         })
 
         server.on('start_turn', function (payload: TurnPayload) {
             waiting.value = false
             timer.value = payload.duration
+
+            anime({
+                targets: '.your-turn',
+                opacity: 1,
+                translateX: ['-50%', '-50%'],
+                translateY: ['-100%', '-50%'],
+                duration: 1000,
+                direction: 'alternate',
+            })
         })
 
         function endTurn() {
@@ -106,7 +139,7 @@ export default defineComponent({
             })
         }
 
-        return { id, timer, endTurn, waiting, attack, setAttacker, attackPlayer }
+        return { id, timer, result, endTurn, waiting, attack, setAttacker, attackPlayer }
     },
 })
 </script>
@@ -114,8 +147,12 @@ export default defineComponent({
 <template>
     <div class="game">
         <Error />
+        <Result :result="result" v-if="result" />
         <PlayedCard class="game__played-card" />
         <Timer v-model:duration="timer" class="game__timer" />
+
+        <h1 class="your-turn">It's your turn!</h1>
+        <h1 class="opponent-turn">Opponent's turn!</h1>
 
         <button @click="endTurn" :disabled="waiting" class="end-turn">
             {{ waiting ? 'Enemy Turn' : 'End Turn' }}
@@ -169,5 +206,17 @@ export default defineComponent({
 .end-turn:disabled {
     background: #ddd;
     cursor: not-allowed;
+}
+.your-turn, .opponent-turn {
+    top: 50%;
+    left: 50%;
+    margin: 0;
+    opacity: 0;
+    z-index: 300;
+    position: fixed;
+    font-size: 60px;
+    white-space: nowrap;
+    pointer-events: none;
+    transform: translate(-50%, -100%);
 }
 </style>

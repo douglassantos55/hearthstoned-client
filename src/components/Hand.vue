@@ -1,4 +1,5 @@
 <script lang="ts">
+import anime from 'animejs'
 import { ref, defineComponent } from 'vue'
 import server from '../server'
 import type { Card, MapOfCards } from '../types'
@@ -16,11 +17,31 @@ export default defineComponent({
 
         server.on('wait_turn', function () {
             startingHand.value = false
+
+            anime({
+                targets: '.opponent-turn',
+                opacity: 1,
+                translateX: ['-50%', '-50%'],
+                translateY: ['-100%', '-50%'],
+                duration: 1000,
+                direction: 'alternate',
+            })
         })
 
         server.on('start_turn', function (payload) {
             startingHand.value = false
-            setCards(payload.cards)
+
+            anime({
+                targets: '.your-turn',
+                opacity: 1,
+                translateX: ['-50%', '-50%'],
+                translateY: ['-100%', '-50%'],
+                duration: 1000,
+                direction: 'alternate',
+                begin: function () {
+                    setCards(payload.cards)
+                }
+            })
         })
 
         server.on('starting_hand', function (payload) {
@@ -65,10 +86,25 @@ export default defineComponent({
                 @click="$emit('playCard', card.Id)"
             />
         </transition-group>
+
+        <h1 class="your-turn">It's your turn!</h1>
+        <h1 class="opponent-turn">Opponent's turn!</h1>
     </div>
 </template>
 
 <style scoped>
+.your-turn, .opponent-turn {
+    top: 50%;
+    left: 50%;
+    margin: 0;
+    opacity: 0;
+    z-index: 300;
+    position: fixed;
+    font-size: 60px;
+    white-space: nowrap;
+    pointer-events: none;
+    transform: translate(-50%, -100%);
+}
 .cards {
     width: 100%;
     display: flex;

@@ -33,6 +33,8 @@ export default defineComponent({
 
         const result = ref('')
         const waiting = ref(false)
+        const animating = ref(false)
+
         const id = ref(route.state.game_id)
         const timer = ref(route.state.duration)
 
@@ -129,6 +131,7 @@ export default defineComponent({
         }
 
         function animate(attacker: HTMLElement, target: HTMLElement, callback: any) {
+            animating.value = true
             const dest = target.getBoundingClientRect()
             const source = attacker.getBoundingClientRect()
 
@@ -139,7 +142,10 @@ export default defineComponent({
                 easing: 'cubicBezier(0,.74,1,-0.31)',
                 direction: 'alternate',
                 targets: attacker,
-                complete: callback,
+                complete: function () {
+                    callback()
+                    animating.value = false
+                },
                 translateX: function () {
                     return dest.x - source.x
                 },
@@ -149,7 +155,17 @@ export default defineComponent({
             })
         }
 
-        return { id, timer, result, endTurn, waiting, attack, setAttacker, attackPlayer }
+        return {
+            id,
+            timer,
+            result,
+            endTurn,
+            waiting,
+            attack,
+            animating,
+            setAttacker,
+            attackPlayer
+        }
     },
 })
 </script>
@@ -164,7 +180,11 @@ export default defineComponent({
         <h1 class="your-turn">It's your turn!</h1>
         <h1 class="opponent-turn">Opponent's turn!</h1>
 
-        <button @click="endTurn" :disabled="waiting" class="end-turn">
+        <button
+            class="end-turn"
+            @click="endTurn"
+            :disabled="waiting || animating"
+        >
             {{ waiting ? 'Enemy Turn' : 'End Turn' }}
         </button>
 

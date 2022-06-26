@@ -1,10 +1,15 @@
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, onUnmounted } from 'vue'
+import server from './server'
 import useRouter from './composables/useRouter'
 
 export default defineComponent({
     setup() {
         const { view } = useRouter()
+        server.connect('ws://0.0.0.0:8080')
+
+        onUnmounted(server.close)
+
         return { view }
     },
 })

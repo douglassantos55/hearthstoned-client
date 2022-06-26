@@ -1,10 +1,34 @@
-const conn = new WebSocket('ws://0.0.0.0:8080')
-
 type Listener = (payload: any) => void
+
+let conn: WebSocket
 
 const listeners: { [type: string]: Listener[] } = {}
 
 const server = {
+    /**
+     * Opens a socket to the specified address
+     *
+     * @param {string} addr - The server address
+     */
+    connect(addr: string) {
+        conn = new WebSocket(addr)
+
+        // Notifies listeners when messages are received from server
+        conn.onmessage = function(message: MessageEvent) {
+            const data = JSON.parse(message.data)
+            if (data) {
+                server._notify(data.type, data.payload)
+            }
+        }
+    },
+
+    /**
+     * Closes socket connection
+     */
+    close() {
+        conn.close()
+    },
+
     /**
      * Sends an event to server
      *
@@ -40,14 +64,6 @@ const server = {
                 listener(payload)
             }
         }
-    }
-}
-
-// Notifies listeners when messages are received from server
-conn.onmessage = function(message: MessageEvent) {
-    const data = JSON.parse(message.data)
-    if (data) {
-        server._notify(data.type, data.payload)
     }
 }
 

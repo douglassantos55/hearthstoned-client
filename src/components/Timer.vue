@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue'
+import { computed, defineComponent, onUnmounted } from 'vue'
 
 export default defineComponent({
     props: {
@@ -11,9 +11,13 @@ export default defineComponent({
     setup(props, { emit }) {
         const ticker = computed(() => props.duration / 1000000000)
 
-        setInterval(function () {
+        const interval = setInterval(function () {
             emit('update:duration', props.duration - 1000000000)
         }, 1000)
+
+        onUnmounted(function () {
+            clearInterval(interval)
+        })
 
         return { ticker }
     },

@@ -3,6 +3,7 @@ import { ref, defineComponent, onBeforeUnmount } from 'vue'
 import server from '../server'
 import type { Card } from '../types'
 import Timer from './Timer.vue'
+import Button from './Button.vue'
 import Player from './Player.vue'
 import Opponent from './Opponent.vue'
 import PlayedCard from './PlayedCard.vue'
@@ -22,6 +23,7 @@ type TurnPayload = {
 export default defineComponent({
     components: {
         Timer,
+        Button,
         Error,
         Player,
         Result,
@@ -144,13 +146,13 @@ export default defineComponent({
         <h1 class="your-turn">It's your turn!</h1>
         <h1 class="opponent-turn">Opponent's turn!</h1>
 
-        <button
+        <Button
             class="end-turn"
             @click="endTurn"
             :disabled="waiting || animating"
         >
             {{ waiting ? 'Enemy Turn' : 'End Turn' }}
-        </button>
+        </Button>
 
         <Opponent
             :playing="waiting"
@@ -186,20 +188,10 @@ export default defineComponent({
 }
 .end-turn {
     top: 50%;
-    border: 0;
     right: 30px;
-    color: #fff;
     z-index: 400;
-    cursor: pointer;
     position: fixed;
-    padding: 15px 20px;
-    background: #4f4ff1;
-    border-radius: 10px;
     transform: translateY(-50%);
-}
-.end-turn:disabled {
-    background: #ddd;
-    cursor: not-allowed;
 }
 .your-turn, .opponent-turn {
     top: 50%;

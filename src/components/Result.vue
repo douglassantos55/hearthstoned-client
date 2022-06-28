@@ -1,6 +1,7 @@
 <script lang="ts">
-import useRouter from '@/composables/useRouter'
 import { computed, defineComponent } from 'vue'
+import useRouter from '@/composables/useRouter'
+import Button from './Button.vue'
 
 export default defineComponent({
     props: {
@@ -8,6 +9,9 @@ export default defineComponent({
             type: String,
             required: true,
         },
+    },
+    components: {
+        Button,
     },
     setup(props) {
         const { redirect } = useRouter()
@@ -26,7 +30,15 @@ export default defineComponent({
         <div class="wrapper">
             <div class="modal">
                 <h1 class="title">{{ title }}</h1>
-                <button class="continue" @click="redirect('/')">Continue</button>
+
+                <Button
+                    large
+                    @click="redirect('/')"
+                    :danger="result == 'loss'"
+                    :success="result == 'win'"
+                >
+                    Continue
+                </Button>
             </div>
         </div>
     </Teleport>
@@ -58,16 +70,5 @@ export default defineComponent({
 .title {
     font-size: 50px;
     font-family: sans-serif;
-}
-.continue {
-    border: 0;
-    padding: 15px 30px;
-    color: #fff;
-    cursor: pointer;
-    font-weight: bold;
-    border-radius: 10px;
-    font-size: 20px;
-    background: green;
-    margin-top: 50px;
 }
 </style>

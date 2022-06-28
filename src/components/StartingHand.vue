@@ -1,6 +1,7 @@
 <script lang="ts">
 import { ref, defineComponent, type PropType } from 'vue'
 import server from '../server'
+import Button from './Button.vue'
 import CardComponent from './Card.vue'
 import type { Card, MapOfCards } from '../types'
 import useRouter from '@/composables/useRouter'
@@ -14,6 +15,7 @@ export default defineComponent({
         },
     },
     components: {
+        Button,
         CardComponent,
     },
     setup(_,  { emit }) {
@@ -76,7 +78,7 @@ export default defineComponent({
             />
         </div>
 
-        <button @click="discard" :disabled="waiting">Confirm</button>
+        <Button @click="discard" :disabled="waiting">Confirm</Button>
     </div>
 </template>
 

@@ -1,10 +1,14 @@
 <script lang="ts">
 import { ref } from 'vue'
 import server from '../server'
+import Button from './Button.vue'
 import useRouter from '@/composables/useRouter'
 
 export default {
     name: 'Queue',
+    components: {
+        Button,
+    },
     setup() {
         const matchId = ref('')
         const waiting = ref(false)
@@ -53,9 +57,9 @@ export default {
 
 <template>
     <div class="queue">
-        <button @click="queueUp" v-if="!matchId" :disabled="waiting">Queue up</button>
+        <Button @click="queueUp" v-if="!matchId" :disabled="waiting">Queue up</Button>
 
-        <button @click="confirm" v-if="matchId" :disabled="waiting">Confirm match</button>
-        <button @click="decline" v-if="matchId" :disabled="waiting">Cancel match</button>
+        <Button success @click="confirm" v-if="matchId" :disabled="waiting">Confirm match</Button>
+        <Button danger @click="decline" v-if="matchId" :disabled="waiting">Cancel match</Button>
     </div>
 </template>

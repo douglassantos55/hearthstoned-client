@@ -25,7 +25,6 @@ watch(queue, function(queue) {
 
 export default function() {
     function animate(target: Element, config: AnimeParams) {
-        console.log(target, config)
         queue.push({ ...config, targets: target })
     }
 

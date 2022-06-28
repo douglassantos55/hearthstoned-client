@@ -49,14 +49,14 @@ export default defineComponent({
             setTimeout(function () {
                 timer.value = 0
                 result.value = 'win'
-            }, 1200)
+            }, 2000)
         })
 
         server.on('loss', function () {
             setTimeout(function () {
                 timer.value = 0
                 result.value = 'loss'
-            }, 1200)
+            }, 2000)
         })
 
         server.on('wait_turn', function (payload: TurnPayload) {

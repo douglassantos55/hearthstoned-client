@@ -50,13 +50,17 @@ export default defineComponent({
                             return (dest.y) - source.y
                         },
                         complete: function () {
-                            minions.value[payload.Defender.Id] = payload.Defender
+                            minions.value[payload.Defender.Id] = {
+                                ...minions.value[payload.Defender.Id],
+                                Health: payload.Defender.Health,
+                            }
+
                             setTimeout(function() {
                                 if (payload.Defender.Health <= 0) {
                                     delete minions.value[payload.Defender.Id]
                                     emit('minionDestroyed', payload.Defender.Id)
                                 }
-                            }, 700)
+                            }, 500)
                         },
                     })
                 }
@@ -65,7 +69,11 @@ export default defineComponent({
 
         server.on('attribute_changed', function (payload) {
             if (minions.value[payload.Id]) {
-                minions.value[payload.Id] = payload
+                minions.value[payload.Id] = {
+                    ...minions.value[payload.Id],
+                    State: payload.State,
+                    Damage: payload.Damage,
+                }
             }
         })
 

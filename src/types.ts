@@ -4,6 +4,7 @@ export type Card = {
     Mana: number
     Damage: number
     Health: number
+    State: string
 }
 
 export type MapOfCards = {

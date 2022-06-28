@@ -1,6 +1,5 @@
 <script lang="ts">
 import useRouter from '@/composables/useRouter'
-import anime from 'animejs'
 import { ref, defineComponent } from 'vue'
 import server from '../server'
 import type { Card, MapOfCards } from '../types'

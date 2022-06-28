@@ -1,22 +1,33 @@
-import anime from 'animejs'
-import type { Ref } from 'vue'
-import { watch, reactive } from 'vue'
+import { ref, reactive, watch } from 'vue'
+import anime, { type AnimeParams } from 'animejs'
 
-export default function(attrs: { [key: string]: Ref }) {
-    const state = reactive<{ [key: string]: any }>({})
+const playing = ref(false)
+const queue = reactive<AnimeParams[]>([])
 
-    for (const ref in attrs) {
-        state[ref] = attrs[ref].value
+watch(queue, function(queue) {
+    if (!playing.value) {
+        if (queue.length > 0) {
+            playing.value = true
 
-        watch(attrs[ref], function(value: any) {
-            anime({
-                round: 1,
-                duration: 1000,
-                targets: state,
-                [ref]: value,
+            const config = queue[0]
+            const animation = anime(config)
+
+            animation.finished.then(function() {
+                setTimeout(function() {
+                    playing.value = false
+                    queue.shift()
+                }, 500)
             })
-        })
+        }
+    }
+})
+
+
+export default function() {
+    function animate(target: Element, config: AnimeParams) {
+        console.log(target, config)
+        queue.push({ ...config, targets: target })
     }
 
-    return state
+    return { playing, animate }
 }

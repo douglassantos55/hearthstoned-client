@@ -1,8 +1,9 @@
 <script lang="ts">
 import { ref, toRefs, defineComponent } from 'vue'
-import server from '../server'
 import Hand from './Hand.vue'
 import Board from './Board.vue'
+import server from '@/server'
+import useAttributes from '@/composables/useAttributes'
 import useAnimation from '@/composables/useAnimation'
 
 export default defineComponent({
@@ -27,7 +28,8 @@ export default defineComponent({
         const maxMana = ref(0)
         const health = ref(30)
 
-        const attrs = useAnimation({ health, curMana, maxMana })
+        const { animate } = useAnimation()
+        const attrs = useAttributes({ health, curMana, maxMana })
 
         server.on('start_turn', function (payload) {
             id.value = payload.player_id
@@ -42,8 +44,31 @@ export default defineComponent({
         })
 
         server.on('player_damage_taken', function (payload) {
-            if (payload.Id == id.value) {
-                health.value = payload.Health
+            if (payload.Player.Id == id.value) {
+                const defender = document.getElementById(payload.Player.Id)
+                const attacker = document.getElementById(payload.Attacker.Id)
+
+                if (attacker && defender) {
+                    const dest = defender.getBoundingClientRect()
+                    const source = attacker.getBoundingClientRect()
+
+                    animate(attacker, {
+                        scale: 1.2,
+                        zIndex: 999,
+                        duration: 500,
+                        easing: 'cubicBezier(0,.74,1,-0.31)',
+                        direction: 'alternate',
+                        complete: function () {
+                            health.value = payload.Player.Health
+                        },
+                        translateX: function () {
+                            return dest.x - source.x
+                        },
+                        translateY: function () {
+                            return (dest.y) - source.y
+                        },
+                    })
+                }
             }
         })
 
@@ -55,6 +80,7 @@ export default defineComponent({
         }
 
         return {
+            id,
             playCard,
             ...toRefs(attrs),
         }
@@ -66,13 +92,13 @@ export default defineComponent({
     <div class="player">
         <Board
             :playing="playing"
-            @minion-selected="(target, id) => $emit('minionSelected', target, id)"
+            @minion-selected="id => $emit('minionSelected', id)"
         />
 
-        <div class="player__portrait">
+        <button :id="id" class="player__portrait">
             <img src="http://placeimg.com/100/100/people" />
             <span class="player__health">{{ health }}</span>
-        </div>
+        </button>
 
         <Hand @play-card="playCard" />
 
@@ -91,7 +117,8 @@ export default defineComponent({
     position: fixed;
 }
 .player__portrait {
-    text-align: center;
+    margin: auto;
+    display: block;
     height: calc(50vh / 3);
 }
 .player__mana {

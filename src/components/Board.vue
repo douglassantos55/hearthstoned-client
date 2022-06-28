@@ -3,6 +3,7 @@ import { defineComponent, ref } from 'vue'
 import server from '@/server'
 import Minion from './Minion.vue'
 import type { Card, MapOfCards } from '@/types'
+import useAnimation from '@/composables/useAnimation'
 
 export default defineComponent({
     props: {
@@ -15,6 +16,8 @@ export default defineComponent({
         Minion,
     },
     setup(props, { emit }) {
+        const { animate } = useAnimation()
+
         const selectedMinion = ref('')
         const minions = ref<MapOfCards>({})
 
@@ -25,19 +28,38 @@ export default defineComponent({
             }
         })
 
-        server.on('minion_destroyed', function (payload: Card) {
-            if (minions.value[payload.Id]) {
-                minions.value[payload.Id] = payload
-                setTimeout(function () {
-                    delete minions.value[payload.Id]
-                    emit('minionDestroyed', payload.Id)
-                }, 500)
-            }
-        })
+        server.on('minion_taken_damage', function (payload) {
+            if (minions.value[payload.Defender.Id]) {
+                const defender = document.getElementById(payload.Defender.Id)
+                const attacker = document.getElementById(payload.Attacker.Id)
 
-        server.on('minion_taken_damage', function (payload: Card) {
-            if (minions.value[payload.Id]) {
-                minions.value[payload.Id] = payload
+                if (attacker && defender) {
+                    const dest = defender.getBoundingClientRect()
+                    const source = attacker.getBoundingClientRect()
+
+                    animate(attacker, {
+                        scale: 1.2,
+                        zIndex: 999,
+                        duration: 500,
+                        easing: 'cubicBezier(0,.74,1,-0.31)',
+                        direction: 'alternate',
+                        translateX: function () {
+                            return dest.x - source.x
+                        },
+                        translateY: function () {
+                            return (dest.y) - source.y
+                        },
+                        complete: function () {
+                            minions.value[payload.Defender.Id] = payload.Defender
+                            setTimeout(function() {
+                                if (payload.Defender.Health <= 0) {
+                                    delete minions.value[payload.Defender.Id]
+                                    emit('minionDestroyed', payload.Defender.Id)
+                                }
+                            }, 700)
+                        },
+                    })
+                }
             }
         })
 
@@ -47,11 +69,11 @@ export default defineComponent({
             }
         })
 
-        function select(event: any, minionId: string) {
+        function select(minionId: string) {
             if (props.playing) {
                 selectedMinion.value = minionId
             }
-            emit('minionSelected', event.target, minionId)
+            emit('minionSelected', minionId)
         }
 
         return { minions, select, selectedMinion }
@@ -67,7 +89,7 @@ export default defineComponent({
             :minion="minion"
             :key="minion.Id"
             :playing="playing"
-            @click="select($event, minion.Id)"
+            @click="select(minion.Id)"
             :selected="selectedMinion == minion.Id"
         />
     </transition-group>

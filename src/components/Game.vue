@@ -1,6 +1,5 @@
 <script lang="ts">
-import { ref, defineComponent, toRaw } from 'vue'
-import anime from 'animejs'
+import { ref, defineComponent, onBeforeUnmount } from 'vue'
 import server from '../server'
 import type { Card } from '../types'
 import Timer from './Timer.vue'
@@ -10,6 +9,7 @@ import PlayedCard from './PlayedCard.vue'
 import Error from './Error.vue'
 import Result from './Result.vue'
 import useRouter from '@/composables/useRouter'
+import useAnimation from '@/composables/useAnimation'
 
 type TurnPayload = {
     cards: Card[]
@@ -30,6 +30,7 @@ export default defineComponent({
     },
     setup() {
         const { route } = useRouter()
+        const { animate } = useAnimation()
 
         const result = ref('')
         const waiting = ref(false)
@@ -39,7 +40,10 @@ export default defineComponent({
         const timer = ref(route.state.duration)
 
         const attackerId = ref('')
-        const attacker = ref<HTMLElement>()
+
+        onBeforeUnmount(function() {
+            server.clear()
+        })
 
         server.on('win', function () {
             setTimeout(function () {
@@ -58,101 +62,61 @@ export default defineComponent({
         server.on('wait_turn', function (payload: TurnPayload) {
             waiting.value = true
             timer.value = payload.duration
+            const target = document.querySelector('.opponent-turn')
 
-            anime({
-                targets: '.opponent-turn',
-                opacity: 1,
-                translateX: ['-50%', '-50%'],
-                translateY: ['-100%', '-50%'],
-                duration: 1000,
-                direction: 'alternate',
-            })
+            if (target) {
+                animate(target, {
+                    opacity: 1,
+                    translateX: ['-50%', '-50%'],
+                    translateY: ['-100%', '-50%'],
+                    duration: 800,
+                    direction: 'alternate',
+                })
+            }
         })
 
         server.on('start_turn', function (payload: TurnPayload) {
             waiting.value = false
             timer.value = payload.duration
+            const target = document.querySelector('.your-turn')
 
-            anime({
-                targets: '.your-turn',
-                opacity: 1,
-                translateX: ['-50%', '-50%'],
-                translateY: ['-100%', '-50%'],
-                duration: 1000,
-                direction: 'alternate',
-            })
+            if (target) {
+                animate(target, {
+                    opacity: 1,
+                    translateX: ['-50%', '-50%'],
+                    translateY: ['-100%', '-50%'],
+                    duration: 800,
+                    direction: 'alternate',
+                })
+            }
         })
 
         function endTurn() {
             server.send('end_turn', id.value)
         }
 
-        function setAttacker(target: HTMLElement, minionId: string) {
-            attacker.value = target
+        function setAttacker(minionId: string) {
             attackerId.value = minionId
         }
 
-        function attack(target: HTMLElement, minionId: string) {
+        function attack(minionId: string) {
             if (attackerId.value) {
-                if (attacker.value) {
-                    // remove reactivity so that it doesn't change when another
-                    // minion is selected
-                    const aggressor = toRaw(attacker.value)
-                    const aggressorId = toRaw(attackerId.value)
-
-                    animate(aggressor, target, function () {
-                        server.send('attack', {
-                            GameId: id.value,
-                            Defender: minionId,
-                            Attacker: aggressorId,
-                        })
-                    })
-                }
+                server.send('attack', {
+                    GameId: id.value,
+                    Defender: minionId,
+                    Attacker: attackerId.value,
+                })
             }
         }
 
-        function attackPlayer(target: HTMLElement, playerId: string) {
+        function attackPlayer(playerId: string) {
             if (attackerId.value) {
-                if (attacker.value) {
-                    // remove reactivity so that it doesn't change when another
-                    // minion is selected
-                    const aggressor = toRaw(attacker.value)
-                    const aggressorId = toRaw(attackerId.value)
-
-                    animate(aggressor, target, function () {
-                        server.send('attack_player', {
-                            GameId: id.value,
-                            Defender: playerId,
-                            Attacker: aggressorId,
-                        })
-                    })
-                }
+                server.send('attack_player', {
+                    GameId: id.value,
+                    Defender: playerId,
+                    Attacker: attackerId.value,
+                })
             }
-        }
-
-        function animate(attacker: HTMLElement, target: HTMLElement, callback: any) {
-            animating.value = true
-            const dest = target.getBoundingClientRect()
-            const source = attacker.getBoundingClientRect()
-
-            anime({
-                scale: 1.2,
-                zIndex: 99,
-                duration: 500,
-                easing: 'cubicBezier(0,.74,1,-0.31)',
-                direction: 'alternate',
-                targets: attacker,
-                complete: function () {
-                    callback()
-                    animating.value = false
-                },
-                translateX: function () {
-                    return dest.x - source.x
-                },
-                translateY: function () {
-                    return (dest.y) - source.y
-                },
-            })
         }
 
         return {

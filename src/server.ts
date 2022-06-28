@@ -53,6 +53,15 @@ const server = {
     },
 
     /**
+     * Clears all listeners
+     */
+    clear() {
+        for (const type in listeners) {
+            delete listeners[type]
+        }
+    },
+
+    /**
      * Executes all registered listeners for a given event type
      *
      * @param {string} type - The event type received from server

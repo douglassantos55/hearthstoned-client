@@ -1,7 +1,8 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import Board from './Board.vue'
 import server from '@/server'
+import Board from './Board.vue'
+import useAttributes from '@/composables/useAttributes'
 import useAnimation from '@/composables/useAnimation'
 
 export default defineComponent({
@@ -22,7 +23,8 @@ export default defineComponent({
         const cardsInHand = ref(3)
         const minions = ref(0)
 
-        const attrs = useAnimation({ mana, health, maxMana })
+        const { animate } = useAnimation()
+        const attrs = useAttributes({ mana, health, maxMana })
 
         server.on('wait_turn', function (payload) {
             maxMana.value = payload.mana
@@ -32,8 +34,31 @@ export default defineComponent({
         })
 
         server.on('player_damage_taken', function (payload) {
-            if (payload.Id == id.value) {
-                health.value = payload.Health
+            if (payload.Player.Id == id.value) {
+                const defender = document.getElementById(payload.Player.Id)
+                const attacker = document.getElementById(payload.Attacker.Id)
+
+                if (attacker && defender) {
+                    const dest = defender.getBoundingClientRect()
+                    const source = attacker.getBoundingClientRect()
+
+                    animate(attacker, {
+                        scale: 1.2,
+                        zIndex: 999,
+                        duration: 500,
+                        easing: 'cubicBezier(0,.74,1,-0.31)',
+                        direction: 'alternate',
+                        complete: function () {
+                            health.value = payload.Player.Health
+                        },
+                        translateX: function () {
+                            return dest.x - source.x
+                        },
+                        translateY: function () {
+                            return (dest.y) - source.y
+                        },
+                    })
+                }
             }
         })
 
@@ -44,8 +69,8 @@ export default defineComponent({
             }
         })
 
-        function select(event: Event) {
-            emit('playerSelected', event.target, id.value)
+        function select() {
+            emit('playerSelected', id.value)
         }
 
         return { id, attrs, minions, cardsInHand, select }
@@ -59,7 +84,12 @@ export default defineComponent({
             <div class="opponent__card" :id="i" v-for="i in cardsInHand" :key="i" />
         </transition-group>
 
-        <button class="opponent__portrait" @click="select" :disabled="minions > 0">
+        <button
+            :id="id"
+            class="opponent__portrait"
+            @click="select"
+            :disabled="minions > 0"
+        >
             <img src="http://placeimg.com/100/100/people" />
             {{ attrs.health }}
         </button>
@@ -69,7 +99,7 @@ export default defineComponent({
             class="board--reverse"
             @minion-played="minions++"
             @minion-destroyed="minions--"
-            @minion-selected="(target, id) => $emit('minionSelected', target, id)"
+            @minion-selected="(id) => $emit('minionSelected', id)"
         />
 
         <span class="opponent__mana">

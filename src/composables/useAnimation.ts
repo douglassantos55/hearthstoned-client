@@ -22,11 +22,14 @@ watch(queue, function(queue) {
     }
 })
 
+function animate(target: Element, config: AnimeParams) {
+    queue.push({ ...config, targets: target })
+}
+
+function play(target: Element, config: AnimeParams) {
+    anime({ ...config, targets: target })
+}
 
 export default function() {
-    function animate(target: Element, config: AnimeParams) {
-        queue.push({ ...config, targets: target })
-    }
-
-    return { playing, animate }
+    return { playing, play, animate }
 }

@@ -32,7 +32,7 @@ export default defineComponent({
     },
     setup() {
         const { route } = useRouter()
-        const { animate } = useAnimation()
+        const { play } = useAnimation()
 
         const result = ref('')
         const waiting = ref(false)
@@ -67,7 +67,7 @@ export default defineComponent({
             const target = document.querySelector('.opponent-turn')
 
             if (target) {
-                animate(target, {
+                play(target, {
                     opacity: 1,
                     translateX: ['-50%', '-50%'],
                     translateY: ['-100%', '-50%'],
@@ -83,7 +83,7 @@ export default defineComponent({
             const target = document.querySelector('.your-turn')
 
             if (target) {
-                animate(target, {
+                play(target, {
                     opacity: 1,
                     translateX: ['-50%', '-50%'],
                     translateY: ['-100%', '-50%'],

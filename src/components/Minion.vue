@@ -2,7 +2,7 @@
 import anime from 'animejs'
 import type { Card } from '@/types'
 import useCardDetails from '@/composables/useCardDetails'
-import { reactive, watch, defineComponent, type PropType, computed, ref } from 'vue'
+import { reactive, watch, defineComponent, type PropType, computed } from 'vue'
 
 type Minion = Card & {
     State: string

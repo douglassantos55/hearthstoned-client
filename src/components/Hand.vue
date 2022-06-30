@@ -1,4 +1,5 @@
 <script lang="ts">
+import useCardDetails from '@/composables/useCardDetails'
 import useRouter from '@/composables/useRouter'
 import { ref, defineComponent } from 'vue'
 import server from '../server'
@@ -13,6 +14,7 @@ export default defineComponent({
     },
     setup() {
         const { route } = useRouter()
+        const { setCard, removeCard } = useCardDetails()
 
         const startingHand = ref(false)
         const hand = ref<MapOfCards>({})
@@ -44,7 +46,7 @@ export default defineComponent({
             }
         }
 
-        return { startingHand, hand, setCards }
+        return { startingHand, hand, setCards, setCard, removeCard }
     },
 })
 </script>
@@ -66,6 +68,8 @@ export default defineComponent({
                 :key="card.Id"
                 class="hand__card"
                 @click="$emit('playCard', card.Id)"
+                @mouseenter="setCard(card)"
+                @mouseleave="removeCard"
             />
         </transition-group>
     </div>

@@ -73,6 +73,7 @@ export default defineComponent({
     left: 0;
     top: 55%;
     width: 100%;
+    font-size: 90%;
     padding: 5px 10px;
     position: absolute;
 }

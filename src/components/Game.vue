@@ -1,5 +1,5 @@
 <script lang="ts">
-import { ref, defineComponent, onBeforeUnmount } from 'vue'
+import { ref, watch, defineComponent, onBeforeUnmount } from 'vue'
 import server from '../server'
 import type { Card } from '../types'
 import Timer from './Timer.vue'
@@ -40,6 +40,13 @@ export default defineComponent({
 
         const id = ref(route.state.game_id)
         const timer = ref(route.state.duration)
+
+        if (!id.value && route.params[0]) {
+            id.value = route.params[0]
+            setTimeout(function() {
+                server.send('reconnected', route.params[0])
+            }, 500)
+        }
 
         const attackerId = ref('')
 

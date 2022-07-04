@@ -31,6 +31,13 @@ export default defineComponent({
         const { animate } = useAnimation()
         const attrs = useAttributes({ health, curMana, maxMana })
 
+        server.on('reconnected', function(payload) {
+            id.value = payload.Player.Id
+            curMana.value = payload.Player.Mana
+            health.value = payload.Player.Health
+            maxMana.value = payload.Player.MaxMana
+        })
+
         server.on('start_turn', function (payload) {
             id.value = payload.player_id
             maxMana.value = payload.mana
@@ -91,6 +98,7 @@ export default defineComponent({
 <template>
     <div class="player">
         <Board
+            player
             :playing="playing"
             @minion-selected="id => $emit('minionSelected', id)"
         />

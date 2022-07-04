@@ -7,6 +7,9 @@ import useAnimation from '@/composables/useAnimation'
 
 export default defineComponent({
     props: {
+        player: {
+            type: Boolean,
+        },
         playing: {
             type: Boolean,
             required: true,
@@ -20,6 +23,15 @@ export default defineComponent({
 
         const selectedMinion = ref('')
         const minions = ref<MapOfCards>({})
+
+        server.on('reconnected', function(payload) {
+            console.log(props.player)
+            if (props.player) {
+                minions.value = payload.Player.Board.Minions
+            } else {
+                minions.value = payload.Opponent.Board.Minions
+            }
+        })
 
         server.on('card_played', function (payload: Card) {
             if (props.playing) {

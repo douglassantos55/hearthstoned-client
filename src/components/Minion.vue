@@ -58,7 +58,7 @@ export default defineComponent({
             </div>
 
             <div class="minion__ability" v-if="minion.Ability">
-                <img src="thunder-icon.png" width="17" height="17" />
+                <img src="/thunder-icon.png" width="17" height="17" />
             </div>
 
             <div class="minion__stat minion__damage">{{ attrs.damage }}</div>

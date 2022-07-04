@@ -24,6 +24,11 @@ export default defineComponent({
             startingHand.value = true
         }
 
+        server.on('reconnected', function(payload) {
+            setCards(Object.values(payload.Player.Hand.Cards))
+            startingHand.value = false
+        })
+
         server.on('wait_turn', function () {
             startingHand.value = false
         })

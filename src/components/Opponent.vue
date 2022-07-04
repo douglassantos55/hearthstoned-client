@@ -26,6 +26,15 @@ export default defineComponent({
         const { animate } = useAnimation()
         const attrs = useAttributes({ mana, health, maxMana })
 
+        server.on('reconnected', function(payload) {
+            id.value = payload.Opponent.Id
+            mana.value = payload.Opponent.Mana
+            health.value = payload.Opponent.Health
+            maxMana.value = payload.Opponent.MaxMana
+            minions.value = Object.values(payload.Opponent.Board.Minions).length
+            cardsInHand.value = Object.values(payload.Opponent.Hand.Cards).length
+        })
+
         server.on('wait_turn', function (payload) {
             maxMana.value = payload.mana
             mana.value = maxMana.value
